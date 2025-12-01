@@ -250,7 +250,7 @@
 
         .helicopter {
             position: absolute;
-            top: 80px;
+            top: 30px;
             left: -300px;
             opacity: 0;
             z-index: 10;
@@ -273,14 +273,14 @@
 
         .banner {
             position: absolute;
-            top: 250px;
+            top: 200px;
             left: 50%;
             transform: translateX(-50%) translateY(-150%);
             width: 90%;
             max-width: 600px;
             background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
             border-radius: 20px;
-            padding: 40px;
+            padding: 30px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.4);
             opacity: 0;
             z-index: 5;
@@ -294,15 +294,15 @@
         .photo-container {
             position: relative;
             display: inline-block;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .student-photo {
-            width: 160px;
-            height: 160px;
+            width: 140px;
+            height: 140px;
             border-radius: 50%;
             object-fit: cover;
-            border: 6px solid #667eea;
+            border: 5px solid #667eea;
             box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
             background: #f0f0f0;
         }
@@ -319,24 +319,18 @@
         }
 
         .student-info {
-            /* --- MODIFICATION START: Display name and parents on a single line --- */
-            display: flex;
-            justify-content: center;
-            flex-wrap: nowrap;
-            white-space: nowrap;
             text-align: center;
-            /* --- MODIFICATION END --- */
         }
 
         .winner-badge {
             display: inline-block;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 8px 20px;
+            padding: 6px 18px;
             border-radius: 20px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 700;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             text-transform: uppercase;
             letter-spacing: 1px;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
@@ -344,35 +338,16 @@
 
         .student-info h2 {
             color: #2c3e50;
-            font-size: 2rem;
-            /* --- MODIFICATION START: Make inline and adjust spacing --- */
-            display: inline;
-            margin-bottom: 0; /* Remove bottom margin */
-            margin-right: 10px; /* Add spacing after name */
-            word-wrap: normal; /* Prevent wrapping */
-            /* --- MODIFICATION END --- */
+            font-size: 1.8rem;
+            margin-bottom: 15px;
             font-weight: 700;
             word-wrap: break-word;
         }
 
-        /* Add a separator after the name (assuming the name is the first element) */
-        .student-info h2::after {
-            content: " | ";
-            font-weight: 700;
-            color: inherit;
-        }
-
         .info-row {
-            /* --- MODIFICATION START: Make inline and adjust spacing for parent info --- */
-            display: inline;
-            margin: 0 5px;
-            padding: 0;
-            box-shadow: none;
-            background: none;
-            /* --- MODIFICATION END --- */
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            padding: 20px 25px;
-            margin: 10px 0;
+            padding: 15px 20px;
+            margin: 8px 0;
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             text-align: center;
@@ -380,9 +355,9 @@
 
         .value {
             color: #495057;
-            font-size: 1.05rem;
+            font-size: 1rem;
             word-wrap: break-word;
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
         .modal {
@@ -616,16 +591,20 @@
             }
             .banner {
                 width: 95%;
-                padding: 30px 20px;
+                padding: 25px 20px;
             }
             .student-info h2 {
-                font-size: 1.5rem;
+                font-size: 1.4rem;
             }
             .info-row {
-                padding: 15px 20px;
+                padding: 12px 15px;
             }
             .value {
-                font-size: 0.95rem;
+                font-size: 0.9rem;
+            }
+            .student-photo {
+                width: 120px;
+                height: 120px;
             }
         }
     </style>
@@ -886,7 +865,7 @@
                 fatherName: "Alhaj Hossain Ali",
                 motherName: "Mst. Fatema Begum",
                 photoUrl: "https://i.pravatar.cc/160?img=13",
-                fixedPosition: 3
+                fixedPosition: 10
             },
             {
                 name: "Fariha Tasnim",
