@@ -687,107 +687,33 @@
         };
         setInterval(devToolsCheck, 1000);
 
+        // Load saved data from localStorage
+        function loadSavedData() {
+            const savedDrawnStudents = localStorage.getItem('drawnStudents');
+            const savedDrawnStudentsList = localStorage.getItem('drawnStudentsList');
+            const savedDrawCount = localStorage.getItem('drawCount');
+            
+            if (savedDrawnStudents) {
+                drawnStudents = new Set(JSON.parse(savedDrawnStudents));
+            }
+            if (savedDrawnStudentsList) {
+                drawnStudentsList = JSON.parse(savedDrawnStudentsList);
+            }
+            if (savedDrawCount) {
+                drawCount = parseInt(savedDrawCount);
+                document.getElementById('drawCount').textContent = drawCount;
+            }
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('drawnStudents', JSON.stringify([...drawnStudents]));
+            localStorage.setItem('drawnStudentsList', JSON.stringify(drawnStudentsList));
+            localStorage.setItem('drawCount', drawCount.toString());
+        }
+
         // Student database (encoded)
         const students = [
-            {"name":"Fariha Tasnim","fatherName":"Tasnim Uddin","motherName":"Rozina Akter","photoUrl":"https://i.pravatar.cc/160?img=47","fixedPosition":null},
-{"name":"Ayesha Siddika","fatherName":"Abdul Karim","motherName":"Fatema Begum","photoUrl":"https://i.pravatar.cc/160?img=1","fixedPosition":null},
-{"name":"Rafi Ahmed","fatherName":"Jahangir Alam","motherName":"Salma Khatun","photoUrl":"https://i.pravatar.cc/160?img=2","fixedPosition":null},
-{"name":"Nusrat Jahan","fatherName":"Mohammad Ali","motherName":"Nasrin Akter","photoUrl":"https://i.pravatar.cc/160?img=3","fixedPosition":null},
-{"name":"Sadman Sakib","fatherName":"Khaled Hossain","motherName":"Shahnaz Parvin","photoUrl":"https://i.pravatar.cc/160?img=4","fixedPosition":null},
-{"name":"Tanjila Rahman","fatherName":"Abdur Rahman","motherName":"Jasmin Akter","photoUrl":"https://i.pravatar.cc/160?img=5","fixedPosition":null},
-{"name":"Arif Hossain","fatherName":"Delwar Hossain","motherName":"Rehana Begum","photoUrl":"https://i.pravatar.cc/160?img=6","fixedPosition":null},
-{"name":"Sumaiya Islam","fatherName":"Nur Islam","motherName":"Roksana Parvin","photoUrl":"https://i.pravatar.cc/160?img=7","fixedPosition":null},
-{"name":"Rasel Mia","fatherName":"Abdul Malek","motherName":"Morium Begum","photoUrl":"https://i.pravatar.cc/160?img=8","fixedPosition":null},
-{"name":"Farhana Yasmin","fatherName":"Yousuf Ali","motherName":"Sabina Yasmin","photoUrl":"https://i.pravatar.cc/160?img=9","fixedPosition":null},
-{"name":"Imran Khan","fatherName":"Sirajul Islam","motherName":"Lutfun Nahar","photoUrl":"https://i.pravatar.cc/160?img=10","fixedPosition":null},
-{"name":"Sanjida Akter","fatherName":"Shah Alam","motherName":"Parvin Akter","photoUrl":"https://i.pravatar.cc/160?img=11","fixedPosition":null},
-{"name":"Tanzim Hasan","fatherName":"Hasan Mahmud","motherName":"Salma Begum","photoUrl":"https://i.pravatar.cc/160?img=12","fixedPosition":null},
-{"name":"Mst. Rumi","fatherName":"Abdul Hakim","motherName":"Momotaz Begum","photoUrl":"https://i.pravatar.cc/160?img=13","fixedPosition":null},
-{"name":"Shakib Al Hasan","fatherName":"Khorshed Alam","motherName":"Shirina Akter","photoUrl":"https://i.pravatar.cc/160?img=14","fixedPosition":null},
-{"name":"Nabila Rahman","fatherName":"Mizanur Rahman","motherName":"Nasima Akter","photoUrl":"https://i.pravatar.cc/160?img=15","fixedPosition":null},
-{"name":"Rakibul Islam","fatherName":"Monirul Islam","motherName":"Runa Laila","photoUrl":"https://i.pravatar.cc/160?img=16","fixedPosition":null},
-{"name":"Sadia Afrin","fatherName":"Abul Kalam","motherName":"Kohinur Begum","photoUrl":"https://i.pravatar.cc/160?img=17","fixedPosition":null},
-{"name":"Mehedi Hasan","fatherName":"Golam Mostafa","motherName":"Jahanara Begum","photoUrl":"https://i.pravatar.cc/160?img=18","fixedPosition":null},
-{"name":"Fahmida Chowdhury","fatherName":"Anwar Hossain","motherName":"Firoza Begum","photoUrl":"https://i.pravatar.cc/160?img=19","fixedPosition":null},
-{"name":"Zahid Hasan","fatherName":"Kamal Uddin","motherName":"Rahima Khatun","photoUrl":"https://i.pravatar.cc/160?img=20","fixedPosition":null},
-{"name":"Rafia Sultana","fatherName":"Sultan Ahmed","motherName":"Halima Begum","photoUrl":"https://i.pravatar.cc/160?img=21","fixedPosition":null},
-{"name":"Asif Iqbal","fatherName":"Iqbal Hossain","motherName":"Shahnaj Parvin","photoUrl":"https://i.pravatar.cc/160?img=22","fixedPosition":null},
-{"name":"Moumita Rani","fatherName":"Bimal Chandra","motherName":"Minati Rani","photoUrl":"https://i.pravatar.cc/160?img=23","fixedPosition":null},
-{"name":"Tarek Aziz","fatherName":"Abdul Aziz","motherName":"Tahera Begum","photoUrl":"https://i.pravatar.cc/160?img=24","fixedPosition":null},
-{"name":"Nishat Tasnim","fatherName":"Taslim Uddin","motherName":"Nargis Akter","photoUrl":"https://i.pravatar.cc/160?img=25","fixedPosition":null},
-{"name":"Shamim Reza","fatherName":"Abdus Sattar","motherName":"Shamima Akter","photoUrl":"https://i.pravatar.cc/160?img=26","fixedPosition":null},
-{"name":"Jannatul Ferdous","fatherName":"Ferdous Ahmed","motherName":"Jorina Begum","photoUrl":"https://i.pravatar.cc/160?img=27","fixedPosition":null},
-{"name":"Rifat Hasan","fatherName":"Enamul Haque","motherName":"Rumi Akter","photoUrl":"https://i.pravatar.cc/160?img=28","fixedPosition":null},
-{"name":"Sumaia Akter","fatherName":"Shafi Uddin","motherName":"Sufia Begum","photoUrl":"https://i.pravatar.cc/160?img=29","fixedPosition":null},
-{"name":"Arman Hossain","fatherName":"Liakat Hossain","motherName":"Lipika","photoUrl":"https://i.pravatar.cc/160?img=30","fixedPosition":null},
-{"name":"Nusrat Jahan","fatherName":"Jamal Uddin","motherName":"Nasima","photoUrl":"https://i.pravatar.cc/160?img=31","fixedPosition":null},
-{"name":"Fahad Bin Aziz","fatherName":"Azizur Rahman","motherName":"Farida Yasmin","photoUrl":"https://i.pravatar.cc/160?img=32","fixedPosition":null},
-{"name":"Tithi Rani","fatherName":"Subrata Barua","motherName":"Tania","photoUrl":"https://i.pravatar.cc/160?img=33","fixedPosition":null},
-{"name":"Sabbir Ahmed","fatherName":"Nur Ahmed","motherName":"Saleha Begum","photoUrl":"https://i.pravatar.cc/160?img=34","fixedPosition":null},
-{"name":"Maliha Islam","fatherName":"Mazharul Islam","motherName":"Mst. Monowara","photoUrl":"https://i.pravatar.cc/160?img=35","fixedPosition":null},
-{"name":"Rayhan Kabir","fatherName":"Abdul Karim","motherName":"Rabeya Khatun","photoUrl":"https://i.pravatar.cc/160?img=36","fixedPosition":null},
-{"name":"Anika Tabassum","fatherName":"Tabassum Ahmed","motherName":"Anjuman Ara","photoUrl":"https://i.pravatar.cc/160?img=37","fixedPosition":null},
-{"name":"Shahin Alam","fatherName":"Sirajul Alam","motherName":"Shahnaz","photoUrl":"https://i.pravatar.cc/160?img=38","fixedPosition":null},
-{"name":"Ritu Akter","fatherName":"Ruhul Amin","motherName":"Rina","photoUrl":"https://i.pravatar.cc/160?img=39","fixedPosition":null},
-{"name":"Ovi Chowdhury","fatherName":"Humayun Chowdhury","motherName":"Oli Begum","photoUrl":"https://i.pravatar.cc/160?img=40","fixedPosition":null},
-{"name":"Tamim Iqbal","fatherName":"Iqbal Hossain","motherName":"Tania","photoUrl":"https://i.pravatar.cc/160?img=41","fixedPosition":null},
-{"name":"Sanjida Islam","fatherName":"Saiful Islam","motherName":"Selina","photoUrl":"https://i.pravatar.cc/160?img=42","fixedPosition":null},
-{"name":"Rasel Parvez","fatherName":"Abdul Kader","motherName":"Parvin Akter","photoUrl":"https://i.pravatar.cc/160?img=43","fixedPosition":null},
-{"name":"Nabila Hossain","fatherName":"Mosharraf Hossain","motherName":"Nasrin","photoUrl":"https://i.pravatar.cc/160?img=44","fixedPosition":null},
-{"name":"Adib Ahmed","fatherName":"Farid Ahmed","motherName":"Dalia","photoUrl":"https://i.pravatar.cc/160?img=45","fixedPosition":null},
-{"name":"Mst. Salma","fatherName":"Abdul Salam","motherName":"Moriom","photoUrl":"https://i.pravatar.cc/160?img=46","fixedPosition":null},
-{"name":"Farzana Akter","fatherName":"Firoz Mia","motherName":"Feroza","photoUrl":"https://i.pravatar.cc/160?img=48","fixedPosition":null},
-{"name":"Rifat Ara","fatherName":"Abdul Hai","motherName":"Ruma","photoUrl":"https://i.pravatar.cc/160?img=49","fixedPosition":null},
-{"name":"Shuvo Roy","fatherName":"Shyamal Roy","motherName":"Shukla Rani","photoUrl":"https://i.pravatar.cc/160?img=50","fixedPosition":null},
-{"name":"Mim Akter","fatherName":"Monir Hossain","motherName":"Mina","photoUrl":"https://i.pravatar.cc/160?img=51","fixedPosition":null},
-{"name":"Tanzina","fatherName":"Tofazzal Hossain","motherName":"Taslima","photoUrl":"https://i.pravatar.cc/160?img=52","fixedPosition":null},
-{"name":"Alif Hasan","fatherName":"Nur Hasan","motherName":"Ayesha","photoUrl":"https://i.pravatar.cc/160?img=53","fixedPosition":null},
-{"name":"Sajib Khan","fatherName":"Asad Khan","motherName":"Sanjida","photoUrl":"https://i.pravatar.cc/160?img=54","fixedPosition":null},
-{"name":"Nishat Anjum","fatherName":"Anwarul Haque","motherName":"Nusrat","photoUrl":"https://i.pravatar.cc/160?img=55","fixedPosition":null},
-{"name":"Raihan Uddin","fatherName":"Moksed Uddin","motherName":"Rina","photoUrl":"https://i.pravatar.cc/160?img=56","fixedPosition":null},
-{"name":"Mou Rani Das","fatherName":"Mohan Das","motherName":"Mita Rani","photoUrl":"https://i.pravatar.cc/160?img=57","fixedPosition":null},
-{"name":"Arifin Shuvo","fatherName":"Abdus Shukur","motherName":"Arifa","photoUrl":"https://i.pravatar.cc/160?img=58","fixedPosition":null},
-{"name":"Sumona Akter","fatherName":"Suman Mia","motherName":"Suma","photoUrl":"https://i.pravatar.cc/160?img=59","fixedPosition":null},
-{"name":"Jubayer Ahmed","fatherName":"Jahangir Ahmed","motherName":"Jorina","photoUrl":"https://i.pravatar.cc/160?img=60","fixedPosition":null},
-{"name":"Shanta Islam","fatherName":"Shamsul Islam","motherName":"Shahnaj","photoUrl":"https://i.pravatar.cc/160?img=61","fixedPosition":null},
-{"name":"Faisal Mahmud","fatherName":"Abdul Hamid","motherName":"Fatema","photoUrl":"https://i.pravatar.cc/160?img=62","fixedPosition":null},
-{"name":"Riya Moni","fatherName":"Ratan Chandra","motherName":"Rina Rani","photoUrl":"https://i.pravatar.cc/160?img=63","fixedPosition":null},
-{"name":"Tanvir Hasan","fatherName":"Delwar Hasan","motherName":"Tahmina","photoUrl":"https://i.pravatar.cc/160?img=64","fixedPosition":null},
-{"name":"Nipa Akter","fatherName":"Nurul Haque","motherName":"Nilufar","photoUrl":"https://i.pravatar.cc/160?img=65","fixedPosition":null},
-{"name":"Sohanur Rahman","fatherName":"Lutfar Rahman","motherName":"Sohana","photoUrl":"https://i.pravatar.cc/160?img=66","fixedPosition":null},
-{"name":"Mst. Nadia","fatherName":"Abul Hossain","motherName":"Nazma","photoUrl":"https://i.pravatar.cc/160?img=67","fixedPosition":null},
-{"name":"Rasel Chowdhury","fatherName":"Mizan Chowdhury","motherName":"Roksana","photoUrl":"https://i.pravatar.cc/160?img=68","fixedPosition":null},
-{"name":"Shirin Akter","fatherName":"Siraj Uddin","motherName":"Shahinur","photoUrl":"https://i.pravatar.cc/160?img=69","fixedPosition":null},
-{"name":"Emran Hossen","fatherName":"Abdul Goni","motherName":"Ema","photoUrl":"https://i.pravatar.cc/160?img=70","fixedPosition":null},
-{"name":"Tithi Rahman","fatherName":"Habibur Rahman","motherName":"Taslima","photoUrl":"https://i.pravatar.cc/160?img=71","fixedPosition":null},
-{"name":"Sajjad Hossain","fatherName":"Josim Uddin","motherName":"Sajeda","photoUrl":"https://i.pravatar.cc/160?img=72","fixedPosition":null},
-{"name":"Farida Yasmin","fatherName":"Yasin Ali","motherName":"Farzana","photoUrl":"https://i.pravatar.cc/160?img=73","fixedPosition":null},
-{"name":"Rifat Jahan","fatherName":"Jashim Uddin","motherName":"Ruma","photoUrl":"https://i.pravatar.cc/160?img=74","fixedPosition":null},
-{"name":"Shakil Ahmed","fatherName":"Monir Ahmed","motherName":"Shahnaz","photoUrl":"https://i.pravatar.cc/160?img=75","fixedPosition":null},
-{"name":"Mst. Mitu","fatherName":"Mokbul Hossain","motherName":"Mina","photoUrl":"https://i.pravatar.cc/160?img=76","fixedPosition":null},
-{"name":"Tania Sultana","fatherName":"Sultan Mahmud","motherName":"Tahmina","photoUrl":"https://i.pravatar.cc/160?img=77","fixedPosition":null},
-{"name":"Rahatul Islam","fatherName":"Mazharul Islam","motherName":"Rumi","photoUrl":"https://i.pravatar.cc/160?img=78","fixedPosition":null},
-{"name":"Naima Akter","fatherName":"Nazrul Islam","motherName":"Nasima","photoUrl":"https://i.pravatar.cc/160?img=79","fixedPosition":null},
-{"name":"Shamim Reza","fatherName":"Abdul Kuddus","motherName":"Shahnaj","photoUrl":"https://i.pravatar.cc/160?img=80","fixedPosition":null},
-{"name":"Afrin Jahan","fatherName":"Abdul Jalil","motherName":"Ayesha","photoUrl":"https://i.pravatar.cc/160?img=81","fixedPosition":null},
-{"name":"Rony Mia","fatherName":"Abdul Hai","motherName":"Rina","photoUrl":"https://i.pravatar.cc/160?img=82","fixedPosition":null},
-{"name":"Suma Akter","fatherName":"Sumon Mia","motherName":"Salma","photoUrl":"https://i.pravatar.cc/160?img=83","fixedPosition":null},
-{"name":"Jamil Ahmed","fatherName":"Jamal Uddin","motherName":"Jasmin","photoUrl":"https://i.pravatar.cc/160?img=84","fixedPosition":null},
-{"name":"Mst. Lipi","fatherName":"Liakat Ali","motherName":"Laila","photoUrl":"https://i.pravatar.cc/160?img=85","fixedPosition":null},
-{"name":"Tuhin Subhra","fatherName":"Subhash Chandra","motherName":"Tania","photoUrl":"https://i.pravatar.cc/160?img=86","fixedPosition":null},
-{"name":"Nasrin Sultana","fatherName":"Sultan Ahmed","motherName":"Nargis","photoUrl":"https://i.pravatar.cc/160?img=87","fixedPosition":null},
-{"name":"Rafiul Islam","fatherName":"Mofizul Islam","motherName":"Ruma","photoUrl":"https://i.pravatar.cc/160?img=88","fixedPosition":null},
-{"name":"Shathi Rani","fatherName":"Shibu Nath","motherName":"Shilpi","photoUrl":"https://i.pravatar.cc/160?img=89","fixedPosition":null},
-{"name":"Imtiaj Ahmed","fatherName":"Moksed Ahmed","motherName":"Imrana","photoUrl":"https://i.pravatar.cc/160?img=90","fixedPosition":null},
-{"name":"Mst. Rina","fatherName":"Ruhul Amin","motherName":"Rehena","photoUrl":"https://i.pravatar.cc/160?img=91","fixedPosition":null},
-{"name":"Sabbir Hossain","fatherName":"Faruk Hossain","motherName":"Sabina","photoUrl":"https://i.pravatar.cc/160?img=92","fixedPosition":null},
-{"name":"Faria Rahman","fatherName":"Motiur Rahman","motherName":"Farhana","photoUrl":"https://i.pravatar.cc/160?img=93","fixedPosition":null},
-{"name":"Tanvir Reza","fatherName":"Abdus Salam","motherName":"Tania","photoUrl":"https://i.pravatar.cc/160?img=94","fixedPosition":null},
-{"name":"Nazia Sultana","fatherName":"Nazrul Islam","motherName":"Nasima","photoUrl":"https://i.pravatar.cc/160?img=95","fixedPosition":null},
-{"name":"Rasel Khan","fatherName":"Asgar Khan","motherName":"Roksana","photoUrl":"https://i.pravatar.cc/160?img=96","fixedPosition":null},
-{"name":"Shammi Akter","fatherName":"Shamim Mia","motherName":"Shahnaz","photoUrl":"https://i.pravatar.cc/160?img=97","fixedPosition":null},
-{"name":"Al Amin","fatherName":"Abdul Mannan","motherName":"Ayesha","photoUrl":"https://i.pravatar.cc/160?img=98","fixedPosition":null},
-{"name":"Mst. Sonia","fatherName":"Sona Mia","motherName":"Sima","photoUrl":"https://i.pravatar.cc/160?img=99","fixedPosition":null},
             {
                 name: "Sakib Rahman",
                 fatherName: "Abdur Rahman",
@@ -959,6 +885,9 @@
                 motherName: selectedStudent.motherName
             });
             
+            // Save to localStorage
+            saveData();
+            
             const helicopter = document.getElementById('helicopter');
             const banner = document.getElementById('banner');
             
@@ -1049,6 +978,11 @@
             drawCount = 0;
             isDrawing = false;
             
+            // Clear localStorage
+            localStorage.removeItem('drawnStudents');
+            localStorage.removeItem('drawnStudentsList');
+            localStorage.removeItem('drawCount');
+            
             document.getElementById('drawCount').textContent = drawCount;
             
             const helicopter = document.getElementById('helicopter');
@@ -1106,32 +1040,53 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
+            // Page setup
+            const pageWidth = 210; // A4 width in mm
+            const pageHeight = 297; // A4 height in mm
+            const margin = 15;
+            const lineHeight = 7;
+            const studentsPerPage = 30;
+            
             // Title
-            doc.setFontSize(16);
+            doc.setFontSize(18);
             doc.setFont(undefined, 'bold');
-            doc.text('Dumuria Government Technical School & College', 105, 15, { align: 'center' });
+            doc.text('Dumuria Government Technical School & College', pageWidth / 2, 20, { align: 'center' });
+            
             doc.setFontSize(14);
-            doc.text('Class Six Student List - Lottery Results', 105, 25, { align: 'center' });
+            doc.text('Class Six Student List - Lottery Results', pageWidth / 2, 28, { align: 'center' });
             
             // Add date
             doc.setFontSize(10);
             doc.setFont(undefined, 'normal');
             const today = new Date().toLocaleDateString('en-GB');
-            doc.text(`Date: ${today}`, 105, 32, { align: 'center' });
+            doc.text(`Date: ${today}`, pageWidth / 2, 35, { align: 'center' });
+            
+            // Draw border for entire page
+            doc.setLineWidth(0.5);
+            doc.rect(margin, margin, pageWidth - 2 * margin, pageHeight - 2 * margin);
             
             // Table header
+            let yPos = 48;
             doc.setFontSize(11);
             doc.setFont(undefined, 'bold');
-            let yPos = 45;
-            doc.text('Position', 15, yPos);
-            doc.text('Student Name', 45, yPos);
-            doc.text('Father Name', 120, yPos);
+            
+            // Column positions
+            const col1 = margin + 5; // Position
+            const col2 = col1 + 20; // Student Name
+            const col3 = col2 + 70; // Father Name
+            const col4 = col3 + 60; // Mother Name
+            
+            doc.text('Pos.', col1, yPos);
+            doc.text('Student Name', col2, yPos);
+            doc.text('Father Name', col3, yPos);
+            doc.text('Mother Name', col4, yPos);
             
             // Draw line under header
-            doc.line(10, yPos + 2, 200, yPos + 2);
+            doc.line(margin + 3, yPos + 2, pageWidth - margin - 3, yPos + 2);
             
             // Table content
             doc.setFont(undefined, 'normal');
+            doc.setFontSize(9);
             yPos += 8;
             
             let pageNumber = 1;
@@ -1139,46 +1094,66 @@
             
             drawnStudentsList.forEach((student, index) => {
                 // Check if we need a new page (30 students per page)
-                if (studentCount === 30) {
+                if (studentCount === studentsPerPage) {
+                    // Add page number at bottom
+                    doc.setFontSize(8);
+                    doc.text(`Page ${pageNumber}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+                    
                     doc.addPage();
                     pageNumber++;
-                    yPos = 20;
                     studentCount = 0;
                     
+                    // Draw border for new page
+                    doc.setLineWidth(0.5);
+                    doc.rect(margin, margin, pageWidth - 2 * margin, pageHeight - 2 * margin);
+                    
+                    yPos = 25;
+                    
                     // Repeat header on new page
+                    doc.setFontSize(11);
                     doc.setFont(undefined, 'bold');
-                    doc.text('Position', 15, yPos);
-                    doc.text('Student Name', 45, yPos);
-                    doc.text('Father Name', 120, yPos);
-                    doc.line(10, yPos + 2, 200, yPos + 2);
+                    doc.text('Pos.', col1, yPos);
+                    doc.text('Student Name', col2, yPos);
+                    doc.text('Father Name', col3, yPos);
+                    doc.text('Mother Name', col4, yPos);
+                    doc.line(margin + 3, yPos + 2, pageWidth - margin - 3, yPos + 2);
+                    
                     doc.setFont(undefined, 'normal');
+                    doc.setFontSize(9);
                     yPos += 8;
                 }
                 
-                // Add student data
-                doc.text(student.position.toString(), 15, yPos);
-                doc.text(student.name.substring(0, 35), 45, yPos);
-                doc.text(student.fatherName.substring(0, 35), 120, yPos);
+                // Add student data with text truncation
+                doc.text(student.position.toString(), col1, yPos);
+                doc.text(student.name.substring(0, 28), col2, yPos);
+                doc.text(student.fatherName.substring(0, 24), col3, yPos);
+                doc.text(student.motherName.substring(0, 22), col4, yPos);
                 
-                yPos += 7;
+                // Draw horizontal line between rows
+                if (studentCount < studentsPerPage - 1 && index < drawnStudentsList.length - 1) {
+                    doc.setDrawColor(200, 200, 200);
+                    doc.line(margin + 3, yPos + 3, pageWidth - margin - 3, yPos + 3);
+                    doc.setDrawColor(0, 0, 0);
+                }
+                
+                yPos += lineHeight;
                 studentCount++;
             });
             
-            // Add footer
-            const totalPages = Math.ceil(drawnStudentsList.length / 30);
-            for (let i = 1; i <= totalPages; i++) {
-                doc.setPage(i);
-                doc.setFontSize(8);
-                doc.text(`Page ${i} of ${totalPages}`, 105, 290, { align: 'center' });
-                doc.text('Total Students: ' + drawnStudentsList.length, 195, 290, { align: 'right' });
-            }
+            // Add page number and total on last page
+            const totalPages = Math.ceil(drawnStudentsList.length / studentsPerPage);
+            doc.setFontSize(8);
+            doc.text(`Page ${pageNumber} of ${totalPages}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+            doc.text(`Total Students: ${drawnStudentsList.length}`, pageWidth - margin - 5, pageHeight - 10, { align: 'right' });
             
             // Save the PDF
-            doc.save('Class_Six_Lottery_Results.pdf');
+            const filename = `Class_Six_Lottery_${today.replace(/\//g, '-')}.pdf`;
+            doc.save(filename);
         }
 
         // Event Listeners
         document.getElementById('startBtn').addEventListener('click', startLottery);
+        document.getElementById('pdfBtn').addEventListener('click', generatePDF);
         document.getElementById('resetBtn').addEventListener('click', showResetModal);
         document.getElementById('cancelBtn').addEventListener('click', closeResetModal);
         document.getElementById('confirmBtn').addEventListener('click', confirmReset);
@@ -1188,6 +1163,14 @@
                 closeResetModal();
             }
         });
+
+        // Load saved data on page load
+        window.addEventListener('load', () => {
+            loadSavedData();
+        });
     </script>
+    
+    <!-- jsPDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </body>
 </html>
