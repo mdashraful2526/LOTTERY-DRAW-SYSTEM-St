@@ -75,6 +75,16 @@
             align-items: center;
         }
 
+        .pdf-btn {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+        }
+
+        .pdf-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(67, 233, 123, 0.5);
+        }
+
         button {
             padding: 18px 45px;
             font-size: 1.1rem;
@@ -511,6 +521,9 @@
             <button class="start-btn" id="startBtn">
                 <span style="position: relative; z-index: 1;">🎲 Draw Winner</span>
             </button>
+            <button class="pdf-btn" id="pdfBtn">
+                <span style="position: relative; z-index: 1;">📄 Download PDF</span>
+            </button>
             <button class="reset-btn" id="resetBtn">
                 <span style="position: relative; z-index: 1;">🔄 Reset System</span>
             </button>
@@ -620,12 +633,12 @@
     <!-- Reset Confirmation Modal -->
     <div class="modal" id="resetModal">
         <div class="modal-content">
-            <h3>⚠️ Confirm Reset</h3>
-            <p>Are you sure you want to reset the lottery system? This action will clear all previous draw history and allow all participants to be selected again.</p>
-            <p style="font-weight: 600; color: #f5576c;">This action cannot be undone!</p>
+            <h3 id="resetTitle">⚠️ First Confirmation</h3>
+            <p id="resetMessage">Are you sure you want to reset the lottery system? This will clear all draw history.</p>
+            <p style="font-weight: 600; color: #f5576c;" id="resetWarning">You need to confirm 3 times!</p>
             <div class="modal-buttons">
                 <button class="modal-btn cancel-btn" id="cancelBtn">Cancel</button>
-                <button class="modal-btn confirm-btn" id="confirmBtn">Yes, Reset System</button>
+                <button class="modal-btn confirm-btn" id="confirmBtn">Yes, Continue</button>
             </div>
         </div>
     </div>
@@ -786,6 +799,8 @@
         let drawnStudents = new Set();
         let isDrawing = false;
         let drawCount = 0;
+        let resetConfirmCount = 0;
+        let drawnStudentsList = []; // Track all drawn students with their positions
 
         // Lottery Functions
         function startLottery() {
@@ -837,6 +852,14 @@
             
             drawnStudents.add(selectedIndex);
             
+            // Add to drawn students list with position
+            drawnStudentsList.push({
+                position: drawCount,
+                name: selectedStudent.name,
+                fatherName: selectedStudent.fatherName,
+                motherName: selectedStudent.motherName
+            });
+            
             const helicopter = document.getElementById('helicopter');
             const banner = document.getElementById('banner');
             
@@ -877,15 +900,53 @@
         }
 
         function showResetModal() {
+            resetConfirmCount = 0;
+            updateResetModal();
             document.getElementById('resetModal').classList.add('active');
+        }
+
+        function updateResetModal() {
+            const title = document.getElementById('resetTitle');
+            const message = document.getElementById('resetMessage');
+            const warning = document.getElementById('resetWarning');
+            const confirmBtn = document.getElementById('confirmBtn');
+
+            if (resetConfirmCount === 0) {
+                title.textContent = '⚠️ First Confirmation (1/3)';
+                message.textContent = 'Are you sure you want to reset the lottery system? This will clear all draw history.';
+                warning.textContent = 'You need to confirm 2 more times!';
+                confirmBtn.textContent = 'Yes, Continue';
+            } else if (resetConfirmCount === 1) {
+                title.textContent = '⚠️ Second Confirmation (2/3)';
+                message.textContent = 'This action will permanently delete all lottery results. All student records will be cleared.';
+                warning.textContent = 'You need to confirm 1 more time!';
+                confirmBtn.textContent = 'I Understand, Continue';
+            } else if (resetConfirmCount === 2) {
+                title.textContent = '🔴 FINAL Confirmation (3/3)';
+                message.textContent = 'THIS IS YOUR LAST CHANCE! After this confirmation, all data will be permanently lost and cannot be recovered.';
+                warning.textContent = 'This is irreversible!';
+                confirmBtn.textContent = 'Yes, Reset Everything';
+                confirmBtn.style.background = 'linear-gradient(135deg, #ff0844 0%, #ffb199 100%)';
+            }
         }
 
         function closeResetModal() {
             document.getElementById('resetModal').classList.remove('active');
+            resetConfirmCount = 0;
+            document.getElementById('confirmBtn').style.background = 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)';
         }
 
         function confirmReset() {
+            resetConfirmCount++;
+            
+            if (resetConfirmCount < 3) {
+                updateResetModal();
+                return;
+            }
+            
+            // Actually reset the system after 3 confirmations
             drawnStudents.clear();
+            drawnStudentsList = [];
             drawCount = 0;
             isDrawing = false;
             
@@ -934,6 +995,87 @@
                     setTimeout(() => confetti.remove(), 3500);
                 }, i * 40);
             }
+        }
+
+        // PDF Generation Function
+        function generatePDF() {
+            if (drawnStudentsList.length === 0) {
+                alert('⚠️ No lottery results to download! Please draw some winners first.');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Title
+            doc.setFontSize(16);
+            doc.setFont(undefined, 'bold');
+            doc.text('Dumuria Government Technical School & College', 105, 15, { align: 'center' });
+            doc.setFontSize(14);
+            doc.text('Class Six Student List - Lottery Results', 105, 25, { align: 'center' });
+            
+            // Add date
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            const today = new Date().toLocaleDateString('en-GB');
+            doc.text(`Date: ${today}`, 105, 32, { align: 'center' });
+            
+            // Table header
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            let yPos = 45;
+            doc.text('Position', 15, yPos);
+            doc.text('Student Name', 45, yPos);
+            doc.text('Father Name', 120, yPos);
+            
+            // Draw line under header
+            doc.line(10, yPos + 2, 200, yPos + 2);
+            
+            // Table content
+            doc.setFont(undefined, 'normal');
+            yPos += 8;
+            
+            let pageNumber = 1;
+            let studentCount = 0;
+            
+            drawnStudentsList.forEach((student, index) => {
+                // Check if we need a new page (30 students per page)
+                if (studentCount === 30) {
+                    doc.addPage();
+                    pageNumber++;
+                    yPos = 20;
+                    studentCount = 0;
+                    
+                    // Repeat header on new page
+                    doc.setFont(undefined, 'bold');
+                    doc.text('Position', 15, yPos);
+                    doc.text('Student Name', 45, yPos);
+                    doc.text('Father Name', 120, yPos);
+                    doc.line(10, yPos + 2, 200, yPos + 2);
+                    doc.setFont(undefined, 'normal');
+                    yPos += 8;
+                }
+                
+                // Add student data
+                doc.text(student.position.toString(), 15, yPos);
+                doc.text(student.name.substring(0, 35), 45, yPos);
+                doc.text(student.fatherName.substring(0, 35), 120, yPos);
+                
+                yPos += 7;
+                studentCount++;
+            });
+            
+            // Add footer
+            const totalPages = Math.ceil(drawnStudentsList.length / 30);
+            for (let i = 1; i <= totalPages; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.text(`Page ${i} of ${totalPages}`, 105, 290, { align: 'center' });
+                doc.text('Total Students: ' + drawnStudentsList.length, 195, 290, { align: 'right' });
+            }
+            
+            // Save the PDF
+            doc.save('Class_Six_Lottery_Results.pdf');
         }
 
         // Event Listeners
