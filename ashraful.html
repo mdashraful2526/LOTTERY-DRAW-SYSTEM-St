@@ -992,7 +992,7 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, updateDoc, deleteDoc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -1012,7 +1012,7 @@
         // Make Firebase available globally
         window.db = db;
         window.auth = auth;
-        window.firestoreFunctions = { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, orderBy };
+        window.firestoreFunctions = { collection, addDoc, getDocs, doc, getDoc, updateDoc, deleteDoc, query, where, orderBy };
         window.authFunctions = { sendPasswordResetEmail };
 
         // Initialize the app
@@ -1022,7 +1022,7 @@
             document.getElementById('attendanceDate').valueAsDate = new Date();
         });
 
-        // Initialize demo data
+        // Initialize comprehensive demo data
         async function initializeDemoData() {
             try {
                 const { collection, getDocs, addDoc } = window.firestoreFunctions;
@@ -1034,34 +1034,58 @@
                     return;
                 }
 
-                // Add demo students
+                console.log('Initializing comprehensive demo data...');
+
+                // Add demo students - 3-4 per class
                 const demoStudents = [
-                    { roll: '101', name: 'আবির হোসেন', class: '6', phone: '01712345601', monthlyFee: '1500', paymentDate: '5', previousResult: 'GPA 4.5' },
-                    { roll: '102', name: 'সাদিয়া আক্তার', class: '6', phone: '01712345602', monthlyFee: '1500', paymentDate: '5', previousResult: 'GPA 4.8' },
-                    { roll: '103', name: 'রাকিব উদ্দিন', class: '6', phone: '01712345603', monthlyFee: '1500', paymentDate: '10', previousResult: 'GPA 4.2' },
-                    { roll: '201', name: 'তাসনিম জাহান', class: '7', phone: '01712345604', monthlyFee: '1800', paymentDate: '5', previousResult: 'GPA 4.9' },
-                    { roll: '202', name: 'মেহেদী হাসান', class: '7', phone: '01712345605', monthlyFee: '1800', paymentDate: '8', previousResult: 'GPA 4.6' },
-                    { roll: '203', name: 'নুসরাত জাবিন', class: '7', phone: '01712345606', monthlyFee: '1800', paymentDate: '12', previousResult: 'GPA 4.7' },
-                    { roll: '301', name: 'ফারহান আহমেদ', class: '8', phone: '01712345607', monthlyFee: '2000', paymentDate: '5', previousResult: 'GPA 4.8' },
-                    { roll: '302', name: 'সুমাইয়া খানম', class: '8', phone: '01712345608', monthlyFee: '2000', paymentDate: '7', previousResult: 'GPA 5.0' },
-                    { roll: '303', name: 'তানভীর রহমান', class: '8', phone: '01712345609', monthlyFee: '2000', paymentDate: '15', previousResult: 'GPA 4.5' },
-                    { roll: '401', name: 'আয়েশা সিদ্দিকা', class: '9', phone: '01712345610', monthlyFee: '2500', paymentDate: '5', previousResult: 'GPA 4.9' },
-                    { roll: '402', name: 'সাকিব আল হাসান', class: '9', phone: '01712345611', monthlyFee: '2500', paymentDate: '10', previousResult: 'GPA 4.7' },
-                    { roll: '403', name: 'জান্নাতুল ফেরদৌস', class: '9', phone: '01712345612', monthlyFee: '2500', paymentDate: '8', previousResult: 'GPA 4.8' },
-                    { roll: '501', name: 'রাফি ইবনে আমিন', class: '10', phone: '01712345613', monthlyFee: '3000', paymentDate: '5', previousResult: 'GPA 4.6' },
-                    { roll: '502', name: 'তাহমিনা আক্তার', class: '10', phone: '01712345614', monthlyFee: '3000', paymentDate: '12', previousResult: 'GPA 4.9' },
-                    { roll: '503', name: 'নাফিস আহমেদ', class: '10', phone: '01712345615', monthlyFee: '3000', paymentDate: '7', previousResult: 'GPA 4.5' },
-                    { roll: '601', name: 'মাহমুদা খাতুন', class: '11', phone: '01712345616', monthlyFee: '3500', paymentDate: '5', previousResult: 'GPA 4.8' },
-                    { roll: '602', name: 'শাহরিয়ার কবীর', class: '11', phone: '01712345617', monthlyFee: '3500', paymentDate: '10', previousResult: 'GPA 4.7' },
-                    { roll: '603', name: 'নাজমুল হক', class: '11', phone: '01712345618', monthlyFee: '3500', paymentDate: '15', previousResult: 'GPA 4.9' }
+                    // Class 6
+                    { roll: '601', name: 'আবির হোসেন', class: '6', phone: '01712345601', monthlyFee: '1500', paymentDate: '5', previousResult: 'GPA 4.5' },
+                    { roll: '602', name: 'সাদিয়া আক্তার', class: '6', phone: '01712345602', monthlyFee: '1500', paymentDate: '5', previousResult: 'GPA 4.8' },
+                    { roll: '603', name: 'রাকিব উদ্দিন', class: '6', phone: '01712345603', monthlyFee: '1500', paymentDate: '10', previousResult: 'GPA 4.2' },
+                    { roll: '604', name: 'তানিয়া ইসলাম', class: '6', phone: '01712345604', monthlyFee: '1500', paymentDate: '8', previousResult: 'GPA 4.6' },
+                    
+                    // Class 7
+                    { roll: '701', name: 'তাসনিম জাহান', class: '7', phone: '01712345605', monthlyFee: '1800', paymentDate: '5', previousResult: 'GPA 4.9' },
+                    { roll: '702', name: 'মেহেদী হাসান', class: '7', phone: '01712345606', monthlyFee: '1800', paymentDate: '8', previousResult: 'GPA 4.6' },
+                    { roll: '703', name: 'নুসরাত জাবিন', class: '7', phone: '01712345607', monthlyFee: '1800', paymentDate: '12', previousResult: 'GPA 4.7' },
+                    { roll: '704', name: 'রিয়াদ হোসেন', class: '7', phone: '01712345608', monthlyFee: '1800', paymentDate: '7', previousResult: 'GPA 4.8' },
+                    
+                    // Class 8
+                    { roll: '801', name: 'ফারহান আহমেদ', class: '8', phone: '01712345609', monthlyFee: '2000', paymentDate: '5', previousResult: 'GPA 4.8' },
+                    { roll: '802', name: 'সুমাইয়া খানম', class: '8', phone: '01712345610', monthlyFee: '2000', paymentDate: '7', previousResult: 'GPA 5.0' },
+                    { roll: '803', name: 'তানভীর রহমান', class: '8', phone: '01712345611', monthlyFee: '2000', paymentDate: '15', previousResult: 'GPA 4.5' },
+                    { roll: '804', name: 'মারিয়া নূর', class: '8', phone: '01712345612', monthlyFee: '2000', paymentDate: '10', previousResult: 'GPA 4.9' },
+                    
+                    // Class 9
+                    { roll: '901', name: 'আয়েশা সিদ্দিকা', class: '9', phone: '01712345613', monthlyFee: '2500', paymentDate: '5', previousResult: 'GPA 4.9' },
+                    { roll: '902', name: 'সাকিব আল হাসান', class: '9', phone: '01712345614', monthlyFee: '2500', paymentDate: '10', previousResult: 'GPA 4.7' },
+                    { roll: '903', name: 'জান্নাতুল ফেরদৌস', class: '9', phone: '01712345615', monthlyFee: '2500', paymentDate: '8', previousResult: 'GPA 4.8' },
+                    { roll: '904', name: 'নাহিয়ান রহমান', class: '9', phone: '01712345616', monthlyFee: '2500', paymentDate: '12', previousResult: 'GPA 4.6' },
+                    
+                    // Class 10
+                    { roll: '1001', name: 'রাফি ইবনে আমিন', class: '10', phone: '01712345617', monthlyFee: '3000', paymentDate: '5', previousResult: 'GPA 4.6' },
+                    { roll: '1002', name: 'তাহমিনা আক্তার', class: '10', phone: '01712345618', monthlyFee: '3000', paymentDate: '12', previousResult: 'GPA 4.9' },
+                    { roll: '1003', name: 'নাফিস আহমেদ', class: '10', phone: '01712345619', monthlyFee: '3000', paymentDate: '7', previousResult: 'GPA 4.5' },
+                    { roll: '1004', name: 'সাবিহা খানম', class: '10', phone: '01712345620', monthlyFee: '3000', paymentDate: '9', previousResult: 'GPA 4.8' },
+                    
+                    // Class 11
+                    { roll: '1101', name: 'মাহমুদা খাতুন', class: '11', phone: '01712345621', monthlyFee: '3500', paymentDate: '5', previousResult: 'GPA 4.8' },
+                    { roll: '1102', name: 'শাহরিয়ার কবীর', class: '11', phone: '01712345622', monthlyFee: '3500', paymentDate: '10', previousResult: 'GPA 4.7' },
+                    { roll: '1103', name: 'নাজমুল হক', class: '11', phone: '01712345623', monthlyFee: '3500', paymentDate: '15', previousResult: 'GPA 4.9' },
+                    { roll: '1104', name: 'রুকাইয়া সুলতানা', class: '11', phone: '01712345624', monthlyFee: '3500', paymentDate: '8', previousResult: 'GPA 5.0' }
                 ];
 
+                // Add students and store their IDs
+                const studentIds = {};
                 for (const student of demoStudents) {
-                    await addDoc(collection(window.db, 'students'), {
+                    const docRef = await addDoc(collection(window.db, 'students'), {
                         ...student,
                         createdAt: new Date().toISOString()
                     });
+                    studentIds[student.roll] = { id: docRef.id, ...student };
                 }
+
+                console.log('Students added:', Object.keys(studentIds).length);
 
                 // Add demo teachers
                 const demoTeachers = [
@@ -1069,7 +1093,8 @@
                     { name: 'সালমা বেগম', subject: 'ইংরেজি', phone: '01812345602', email: 'salma@coaching.com' },
                     { name: 'রহিম উদ্দিন', subject: 'গণিত', phone: '01812345603', email: 'rahim@coaching.com' },
                     { name: 'নাসরিন আক্তার', subject: 'বিজ্ঞান', phone: '01812345604', email: 'nasrin@coaching.com' },
-                    { name: 'আব্দুল মালেক', subject: 'সমাজ', phone: '01812345605', email: 'malek@coaching.com' }
+                    { name: 'আব্দুল মালেক', subject: 'সামাজিক বিজ্ঞান', phone: '01812345605', email: 'malek@coaching.com' },
+                    { name: 'ফাতেমা খাতুন', subject: 'ধর্ম', phone: '01812345606', email: 'fatema@coaching.com' }
                 ];
 
                 for (const teacher of demoTeachers) {
@@ -1079,57 +1104,127 @@
                     });
                 }
 
-                // Add some demo attendance for today
-                const today = new Date().toISOString().split('T')[0];
-                const studentsForAttendance = await getDocs(collection(window.db, 'students'));
-                let count = 0;
-                for (const doc of studentsForAttendance.docs) {
-                    const student = doc.data();
-                    // Make 70% of students present
-                    const isPresent = count % 10 < 7;
-                    await addDoc(collection(window.db, 'attendance'), {
-                        studentId: doc.id,
-                        date: today,
-                        present: isPresent,
-                        class: student.class
-                    });
-                    count++;
+                console.log('Teachers added:', demoTeachers.length);
+
+                // Add comprehensive attendance data for last 30 days
+                const attendanceData = [];
+                for (let i = 0; i < 30; i++) {
+                    const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+                    
+                    for (const [roll, student] of Object.entries(studentIds)) {
+                        // 75-85% attendance rate
+                        const random = Math.random();
+                        const isPresent = random > 0.20; // 80% attendance
+                        
+                        attendanceData.push({
+                            studentId: student.id,
+                            studentName: student.name,
+                            studentRoll: roll,
+                            date: date,
+                            present: isPresent,
+                            class: student.class
+                        });
+                    }
                 }
 
-                // Add some demo test results
-                const testDates = [
-                    new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                    new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                    new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-                ];
+                // Add attendance in batches
+                for (const attendance of attendanceData) {
+                    await addDoc(collection(window.db, 'attendance'), attendance);
+                }
 
-                const subjects = ['বাংলা', 'ইংরেজি', 'গণিত'];
-                const studentsForTests = await getDocs(collection(window.db, 'students'));
+                console.log('Attendance records added:', attendanceData.length);
+
+                // Add comprehensive test results for all subjects
+                const subjects = ['বাংলা', 'ইংরেজি', 'গণিত', 'বিজ্ঞান', 'সামাজিক বিজ্ঞান'];
+                const testData = [];
+
+                // Generate 5 tests per subject per class (last 60 days)
+                for (let testNum = 0; testNum < 5; testNum++) {
+                    const daysAgo = testNum * 12 + Math.floor(Math.random() * 5); // Spread tests over 60 days
+                    const testDate = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+                    
+                    for (const subject of subjects) {
+                        for (const [roll, student] of Object.entries(studentIds)) {
+                            // Generate realistic marks (60-100)
+                            const baseScore = 60 + Math.floor(Math.random() * 25); // 60-85
+                            const bonus = Math.random() > 0.3 ? Math.floor(Math.random() * 15) : 0; // Sometimes add 0-15
+                            const marks = Math.min(100, baseScore + bonus);
+                            
+                            testData.push({
+                                studentId: student.id,
+                                studentName: student.name,
+                                studentRoll: roll,
+                                class: student.class,
+                                subject: subject,
+                                marks: marks.toString(),
+                                totalMarks: '100',
+                                date: testDate,
+                                createdAt: new Date().toISOString()
+                            });
+                        }
+                    }
+                }
+
+                // Add test results
+                for (const test of testData) {
+                    await addDoc(collection(window.db, 'tests'), test);
+                }
+
+                console.log('Test results added:', testData.length);
+
+                // Add payment history for last 6 months
+                const paymentData = [];
+                const months = ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'];
+                const currentMonth = new Date().getMonth();
                 
-                let testCount = 0;
-                for (const doc of studentsForTests.docs) {
-                    const student = { id: doc.id, ...doc.data() };
-                    const subject = subjects[testCount % subjects.length];
-                    const testDate = testDates[testCount % testDates.length];
-                    const marks = Math.floor(Math.random() * 30) + 70; // Random marks between 70-100
-
-                    await addDoc(collection(window.db, 'tests'), {
-                        studentId: student.id,
-                        studentName: student.name,
-                        class: student.class,
-                        subject: subject,
-                        marks: marks.toString(),
-                        totalMarks: '100',
-                        date: testDate,
-                        createdAt: new Date().toISOString()
-                    });
-                    testCount++;
-                    if (testCount >= 15) break; // Add only 15 test results
+                for (let i = 0; i < 6; i++) {
+                    const monthIndex = (currentMonth - i + 12) % 12;
+                    const monthName = months[monthIndex];
+                    const year = new Date().getFullYear() - (currentMonth - i < 0 ? 1 : 0);
+                    
+                    for (const [roll, student] of Object.entries(studentIds)) {
+                        // 90% payment rate
+                        const isPaid = Math.random() > 0.10;
+                        const paymentDateInMonth = parseInt(student.paymentDate);
+                        const paidDate = isPaid ? 
+                            new Date(year, monthIndex, paymentDateInMonth + Math.floor(Math.random() * 5)).toISOString().split('T')[0] : 
+                            null;
+                        
+                        paymentData.push({
+                            studentId: student.id,
+                            studentName: student.name,
+                            studentRoll: roll,
+                            class: student.class,
+                            month: monthName,
+                            year: year.toString(),
+                            amount: student.monthlyFee,
+                            isPaid: isPaid,
+                            paidDate: paidDate,
+                            dueDate: `${paymentDateInMonth}/${monthIndex + 1}/${year}`,
+                            createdAt: new Date().toISOString()
+                        });
+                    }
                 }
 
-                console.log('Demo data initialized successfully');
+                // Add payment records
+                for (const payment of paymentData) {
+                    await addDoc(collection(window.db, 'payments'), payment);
+                }
+
+                console.log('Payment records added:', paymentData.length);
+
+                console.log('✅ All demo data initialized successfully!');
+                console.log('Total records:', {
+                    students: Object.keys(studentIds).length,
+                    teachers: demoTeachers.length,
+                    attendance: attendanceData.length,
+                    tests: testData.length,
+                    payments: paymentData.length
+                });
+
             } catch (error) {
                 console.error('Error initializing demo data:', error);
+                alert('ডেমো ডেটা লোড করতে সমস্যা হয়েছে। পেজ রিফ্রেশ করুন।');
             }
         }
     </script>
@@ -1772,37 +1867,53 @@
 
             try {
                 const { collection, getDocs, query, where } = window.firestoreFunctions;
-                let q;
                 
+                // Get current month payments
+                const currentMonth = ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'][new Date().getMonth()];
+                const currentYear = new Date().getFullYear().toString();
+                
+                let paymentsQuery;
                 if (selectedClass) {
-                    q = query(collection(window.db, 'students'), where('class', '==', selectedClass));
+                    paymentsQuery = query(
+                        collection(window.db, 'payments'),
+                        where('class', '==', selectedClass),
+                        where('month', '==', currentMonth),
+                        where('year', '==', currentYear)
+                    );
                 } else {
-                    q = collection(window.db, 'students');
+                    paymentsQuery = query(
+                        collection(window.db, 'payments'),
+                        where('month', '==', currentMonth),
+                        where('year', '==', currentYear)
+                    );
                 }
 
-                const studentsSnapshot = await getDocs(q);
+                const paymentsSnapshot = await getDocs(paymentsQuery);
                 const tbody = document.getElementById('paymentsTableBody');
                 tbody.innerHTML = '';
 
-                const currentDay = new Date().getDate();
+                if (paymentsSnapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">কোনো পেমেন্ট রেকর্ড পাওয়া যায়নি</td></tr>';
+                    return;
+                }
 
-                studentsSnapshot.forEach(doc => {
-                    const student = doc.data();
-                    const isPaid = parseInt(student.paymentDate) >= currentDay;
+                paymentsSnapshot.forEach(doc => {
+                    const payment = doc.data();
                     
                     const row = tbody.insertRow();
                     row.innerHTML = `
-                        <td>${student.name}</td>
-                        <td>ক্লাস ${student.class}</td>
-                        <td>৳${student.monthlyFee}</td>
-                        <td>${student.paymentDate} তারিখ</td>
+                        <td>${payment.studentName}</td>
+                        <td>ক্লাস ${payment.class}</td>
+                        <td>৳${payment.amount}</td>
+                        <td>${payment.dueDate}</td>
                         <td>
-                            <span class="badge ${isPaid ? 'paid' : 'unpaid'}">
-                                ${isPaid ? 'পরিশোধিত' : 'বকেয়া'}
+                            <span class="badge ${payment.isPaid ? 'paid' : 'unpaid'}">
+                                ${payment.isPaid ? '✓ পরিশোধিত' : '✗ বকেয়া'}
                             </span>
                         </td>
                         <td>
-                            <button class="action-btn view" onclick="viewPaymentHistory('${doc.id}')">দেখুন</button>
+                            <button class="action-btn view" onclick="viewPaymentHistory('${payment.studentId}', '${payment.studentName}')">হিস্টরি দেখুন</button>
+                            ${!payment.isPaid ? `<button class="action-btn" style="background: var(--secondary);" onclick="markAsPaid('${doc.id}')">পরিশোধ করুন</button>` : ''}
                         </td>
                     `;
                 });
@@ -1811,20 +1922,175 @@
             }
         }
 
-        function viewStudent(id) {
-            alert('Student details will be shown here');
+        async function viewPaymentHistory(studentId, studentName) {
+            try {
+                const { collection, getDocs, query, where, orderBy } = window.firestoreFunctions;
+                
+                const paymentsQuery = query(
+                    collection(window.db, 'payments'),
+                    where('studentId', '==', studentId)
+                );
+                
+                const paymentsSnapshot = await getDocs(paymentsQuery);
+                
+                let historyHtml = `
+                    <div style="padding: 20px; background: white; border-radius: 15px; max-width: 600px; margin: 20px auto;">
+                        <h3 style="margin-bottom: 20px; color: var(--primary);">${studentName} - পেমেন্ট হিস্টরি</h3>
+                        <table style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>মাস</th>
+                                    <th>বছর</th>
+                                    <th>পরিমাণ</th>
+                                    <th>স্ট্যাটাস</th>
+                                    <th>তারিখ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                
+                const payments = [];
+                paymentsSnapshot.forEach(doc => {
+                    payments.push(doc.data());
+                });
+                
+                // Sort by year and month
+                payments.sort((a, b) => {
+                    if (a.year !== b.year) return b.year - a.year;
+                    const months = ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'];
+                    return months.indexOf(b.month) - months.indexOf(a.month);
+                });
+                
+                payments.forEach(payment => {
+                    historyHtml += `
+                        <tr>
+                            <td>${payment.month}</td>
+                            <td>${payment.year}</td>
+                            <td>৳${payment.amount}</td>
+                            <td>
+                                <span class="badge ${payment.isPaid ? 'paid' : 'unpaid'}">
+                                    ${payment.isPaid ? '✓ পরিশোধিত' : '✗ বকেয়া'}
+                                </span>
+                            </td>
+                            <td>${payment.paidDate || '-'}</td>
+                        </tr>
+                    `;
+                });
+                
+                historyHtml += `
+                            </tbody>
+                        </table>
+                        <button class="btn btn-primary" onclick="closePaymentHistory()" style="margin-top: 20px;">বন্ধ করুন</button>
+                    </div>
+                `;
+                
+                const modal = document.createElement('div');
+                modal.id = 'paymentHistoryModal';
+                modal.className = 'modal active';
+                modal.innerHTML = `<div class="modal-content" style="max-width: 700px;">${historyHtml}</div>`;
+                document.body.appendChild(modal);
+                
+            } catch (error) {
+                console.error('Error loading payment history:', error);
+                alert('পেমেন্ট হিস্টরি লোড করতে সমস্যা হয়েছে!');
+            }
+        }
+
+        function closePaymentHistory() {
+            const modal = document.getElementById('paymentHistoryModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        async function markAsPaid(paymentId) {
+            try {
+                const { doc, updateDoc } = window.firestoreFunctions;
+                
+                await updateDoc(doc(window.db, 'payments', paymentId), {
+                    isPaid: true,
+                    paidDate: new Date().toISOString().split('T')[0]
+                });
+                
+                alert('পেমেন্ট সফলভাবে আপডেট হয়েছে!');
+                loadPayments();
+            } catch (error) {
+                console.error('Error updating payment:', error);
+                alert('পেমেন্ট আপডেট করতে সমস্যা হয়েছে!');
+            }
+        }
+
+        async function viewStudent(id) {
+            try {
+                const { collection, doc, getDoc, getDocs, query, where } = window.firestoreFunctions;
+                
+                const studentDoc = await getDoc(doc(window.db, 'students', id));
+                const student = studentDoc.data();
+                
+                // Get attendance stats
+                const attendanceQuery = query(collection(window.db, 'attendance'), where('studentId', '==', id));
+                const attendanceSnapshot = await getDocs(attendanceQuery);
+                let totalDays = 0, presentDays = 0;
+                attendanceSnapshot.forEach(doc => {
+                    totalDays++;
+                    if (doc.data().present) presentDays++;
+                });
+                const attendancePercent = totalDays > 0 ? ((presentDays / totalDays) * 100).toFixed(1) : 0;
+                
+                // Get test results
+                const testsQuery = query(collection(window.db, 'tests'), where('studentId', '==', id));
+                const testsSnapshot = await getDocs(testsQuery);
+                let testsHtml = '<h4>সাম্প্রতিক পরীক্ষার ফলাফল:</h4><table style="width: 100%; margin-top: 10px;"><thead><tr><th>তারিখ</th><th>বিষয়</th><th>মার্কস</th></tr></thead><tbody>';
+                
+                const tests = [];
+                testsSnapshot.forEach(doc => tests.push(doc.data()));
+                tests.sort((a, b) => new Date(b.date) - new Date(a.date));
+                tests.slice(0, 10).forEach(test => {
+                    testsHtml += `<tr><td>${test.date}</td><td>${test.subject}</td><td>${test.marks}/${test.totalMarks}</td></tr>`;
+                });
+                testsHtml += '</tbody></table>';
+                
+                const detailsHtml = `
+                    <div style="padding: 20px;">
+                        <h2 style="color: var(--primary); margin-bottom: 20px;">শিক্ষার্থীর বিস্তারিত তথ্য</h2>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
+                            <div><strong>রোল:</strong> ${student.roll}</div>
+                            <div><strong>নাম:</strong> ${student.name}</div>
+                            <div><strong>ক্লাস:</strong> ক্লাস ${student.class}</div>
+                            <div><strong>ফোন:</strong> ${student.phone}</div>
+                            <div><strong>মাসিক ফি:</strong> ৳${student.monthlyFee}</div>
+                            <div><strong>পেমেন্ট তারিখ:</strong> ${student.paymentDate} তারিখ</div>
+                            <div style="grid-column: 1 / -1;"><strong>পূর্ববর্তী ফলাফল:</strong> ${student.previousResult}</div>
+                            <div style="grid-column: 1 / -1;"><strong>উপস্থিতির হার:</strong> ${attendancePercent}% (${presentDays}/${totalDays} দিন)</div>
+                        </div>
+                        ${testsHtml}
+                        <button class="btn btn-primary" onclick="closeStudentView()" style="margin-top: 20px;">বন্ধ করুন</button>
+                    </div>
+                `;
+                
+                const modal = document.createElement('div');
+                modal.id = 'studentViewModal';
+                modal.className = 'modal active';
+                modal.innerHTML = `<div class="modal-content" style="max-width: 800px;">${detailsHtml}</div>`;
+                document.body.appendChild(modal);
+                
+            } catch (error) {
+                console.error('Error viewing student:', error);
+                alert('শিক্ষার্থীর তথ্য লোড করতে সমস্যা হয়েছে!');
+            }
+        }
+
+        function closeStudentView() {
+            const modal = document.getElementById('studentViewModal');
+            if (modal) modal.remove();
         }
 
         function editStudent(id) {
-            alert('Edit functionality will be implemented');
+            alert('এডিট ফিচার শীঘ্রই যোগ করা হবে!');
         }
 
         function editTeacher(id) {
-            alert('Edit functionality will be implemented');
-        }
-
-        function viewPaymentHistory(id) {
-            alert('Payment history will be shown here');
+            alert('এডিট ফিচার শীঘ্রই যোগ করা হবে!');
         }
     </script>
 </body>
