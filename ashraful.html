@@ -555,11 +555,116 @@
             padding: 10px;
             border-bottom: 1px solid var(--border);
         }
+
+        /* Public View Styles */
+        .public-header {
+            background: white;
+            padding: 25px 0;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .public-header h1 {
+            font-family: 'Baloo Da 2', cursive;
+            color: var(--primary);
+            font-size: 2em;
+            margin: 0;
+        }
+
+        #publicView {
+            display: block;
+        }
     </style>
 </head>
 <body>
+    <!-- Public View -->
+    <div id="publicView">
+        <div class="public-header">
+            <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+                <h1>🎓 আমাদের কোচিং সেন্টার</h1>
+                <button class="btn btn-primary" onclick="showAdminLogin()" style="width: auto; padding: 12px 30px;">
+                    🔐 Admin Login
+                </button>
+            </div>
+        </div>
+
+        <div class="container" style="margin-top: 30px;">
+            <!-- Public Stats -->
+            <div class="stats-grid">
+                <div class="stat-card blue">
+                    <h3>মোট শিক্ষার্থী</h3>
+                    <div class="number" id="publicTotalStudents">0</div>
+                </div>
+                <div class="stat-card green">
+                    <h3>আজকের উপস্থিতি</h3>
+                    <div class="number" id="publicTodayPresent">0</div>
+                </div>
+                <div class="stat-card orange">
+                    <h3>মোট শিক্ষক</h3>
+                    <div class="number" id="publicTotalTeachers">0</div>
+                </div>
+                <div class="stat-card red">
+                    <h3>মোট ক্লাস</h3>
+                    <div class="number">6</div>
+                </div>
+            </div>
+
+            <!-- Student Search for Public -->
+            <div style="background: white; padding: 30px; border-radius: 20px; margin-top: 30px; box-shadow: var(--shadow);">
+                <h2 style="margin-bottom: 20px;">শিক্ষার্থী খুঁজুন</h2>
+                <div class="search-bar">
+                    <input type="text" id="publicSearchStudent" placeholder="নাম বা রোল দিয়ে সার্চ করুন..." oninput="publicSearchStudents()">
+                    <select id="publicFilterClass" onchange="publicSearchStudents()">
+                        <option value="">সব ক্লাস</option>
+                        <option value="6">ক্লাস ৬</option>
+                        <option value="7">ক্লাস ৭</option>
+                        <option value="8">ক্লাস ৮</option>
+                        <option value="9">ক্লাস ৯</option>
+                        <option value="10">ক্লাস ১০</option>
+                        <option value="11">ক্লাস ১১</option>
+                    </select>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>রোল</th>
+                                <th>নাম</th>
+                                <th>ক্লাস</th>
+                                <th>আজকের উপস্থিতি</th>
+                            </tr>
+                        </thead>
+                        <tbody id="publicStudentsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Recent Test Results for Public -->
+            <div style="background: white; padding: 30px; border-radius: 20px; margin-top: 30px; box-shadow: var(--shadow);">
+                <h2 style="margin-bottom: 20px;">সাম্প্রতিক পরীক্ষার ফলাফল</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>তারিখ</th>
+                                <th>ক্লাস</th>
+                                <th>বিষয়</th>
+                                <th>শিক্ষার্থী</th>
+                                <th>মার্কস</th>
+                            </tr>
+                        </thead>
+                        <tbody id="publicTestsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Login Page -->
-    <div id="loginPage" class="login-container">
+    <div id="loginPage" class="login-container" style="display: none;">
         <div class="login-box">
             <div class="login-header">
                 <h1>🎓 কোচিং সিস্টেম</h1>
@@ -579,6 +684,9 @@
                     <a href="#" id="forgotPasswordLink">পাসওয়ার্ড ভুলে গেছেন?</a>
                 </div>
             </form>
+            <div class="forgot-password" style="margin-top: 15px;">
+                <a href="#" onclick="backToPublicView()">← পাবলিক ভিউতে ফিরে যান</a>
+            </div>
         </div>
     </div>
 
@@ -909,12 +1017,256 @@
 
         // Initialize the app
         window.addEventListener('load', () => {
-            loadDashboardData();
+            initializeDemoData();
+            loadPublicData();
             document.getElementById('attendanceDate').valueAsDate = new Date();
         });
+
+        // Initialize demo data
+        async function initializeDemoData() {
+            try {
+                const { collection, getDocs, addDoc } = window.firestoreFunctions;
+                
+                // Check if data already exists
+                const studentsSnapshot = await getDocs(collection(window.db, 'students'));
+                if (studentsSnapshot.size > 0) {
+                    console.log('Demo data already exists');
+                    return;
+                }
+
+                // Add demo students
+                const demoStudents = [
+                    { roll: '101', name: 'আবির হোসেন', class: '6', phone: '01712345601', monthlyFee: '1500', paymentDate: '5', previousResult: 'GPA 4.5' },
+                    { roll: '102', name: 'সাদিয়া আক্তার', class: '6', phone: '01712345602', monthlyFee: '1500', paymentDate: '5', previousResult: 'GPA 4.8' },
+                    { roll: '103', name: 'রাকিব উদ্দিন', class: '6', phone: '01712345603', monthlyFee: '1500', paymentDate: '10', previousResult: 'GPA 4.2' },
+                    { roll: '201', name: 'তাসনিম জাহান', class: '7', phone: '01712345604', monthlyFee: '1800', paymentDate: '5', previousResult: 'GPA 4.9' },
+                    { roll: '202', name: 'মেহেদী হাসান', class: '7', phone: '01712345605', monthlyFee: '1800', paymentDate: '8', previousResult: 'GPA 4.6' },
+                    { roll: '203', name: 'নুসরাত জাবিন', class: '7', phone: '01712345606', monthlyFee: '1800', paymentDate: '12', previousResult: 'GPA 4.7' },
+                    { roll: '301', name: 'ফারহান আহমেদ', class: '8', phone: '01712345607', monthlyFee: '2000', paymentDate: '5', previousResult: 'GPA 4.8' },
+                    { roll: '302', name: 'সুমাইয়া খানম', class: '8', phone: '01712345608', monthlyFee: '2000', paymentDate: '7', previousResult: 'GPA 5.0' },
+                    { roll: '303', name: 'তানভীর রহমান', class: '8', phone: '01712345609', monthlyFee: '2000', paymentDate: '15', previousResult: 'GPA 4.5' },
+                    { roll: '401', name: 'আয়েশা সিদ্দিকা', class: '9', phone: '01712345610', monthlyFee: '2500', paymentDate: '5', previousResult: 'GPA 4.9' },
+                    { roll: '402', name: 'সাকিব আল হাসান', class: '9', phone: '01712345611', monthlyFee: '2500', paymentDate: '10', previousResult: 'GPA 4.7' },
+                    { roll: '403', name: 'জান্নাতুল ফেরদৌস', class: '9', phone: '01712345612', monthlyFee: '2500', paymentDate: '8', previousResult: 'GPA 4.8' },
+                    { roll: '501', name: 'রাফি ইবনে আমিন', class: '10', phone: '01712345613', monthlyFee: '3000', paymentDate: '5', previousResult: 'GPA 4.6' },
+                    { roll: '502', name: 'তাহমিনা আক্তার', class: '10', phone: '01712345614', monthlyFee: '3000', paymentDate: '12', previousResult: 'GPA 4.9' },
+                    { roll: '503', name: 'নাফিস আহমেদ', class: '10', phone: '01712345615', monthlyFee: '3000', paymentDate: '7', previousResult: 'GPA 4.5' },
+                    { roll: '601', name: 'মাহমুদা খাতুন', class: '11', phone: '01712345616', monthlyFee: '3500', paymentDate: '5', previousResult: 'GPA 4.8' },
+                    { roll: '602', name: 'শাহরিয়ার কবীর', class: '11', phone: '01712345617', monthlyFee: '3500', paymentDate: '10', previousResult: 'GPA 4.7' },
+                    { roll: '603', name: 'নাজমুল হক', class: '11', phone: '01712345618', monthlyFee: '3500', paymentDate: '15', previousResult: 'GPA 4.9' }
+                ];
+
+                for (const student of demoStudents) {
+                    await addDoc(collection(window.db, 'students'), {
+                        ...student,
+                        createdAt: new Date().toISOString()
+                    });
+                }
+
+                // Add demo teachers
+                const demoTeachers = [
+                    { name: 'মোঃ করিম উল্লাহ', subject: 'বাংলা', phone: '01812345601', email: 'karim@coaching.com' },
+                    { name: 'সালমা বেগম', subject: 'ইংরেজি', phone: '01812345602', email: 'salma@coaching.com' },
+                    { name: 'রহিম উদ্দিন', subject: 'গণিত', phone: '01812345603', email: 'rahim@coaching.com' },
+                    { name: 'নাসরিন আক্তার', subject: 'বিজ্ঞান', phone: '01812345604', email: 'nasrin@coaching.com' },
+                    { name: 'আব্দুল মালেক', subject: 'সমাজ', phone: '01812345605', email: 'malek@coaching.com' }
+                ];
+
+                for (const teacher of demoTeachers) {
+                    await addDoc(collection(window.db, 'teachers'), {
+                        ...teacher,
+                        createdAt: new Date().toISOString()
+                    });
+                }
+
+                // Add some demo attendance for today
+                const today = new Date().toISOString().split('T')[0];
+                const studentsForAttendance = await getDocs(collection(window.db, 'students'));
+                let count = 0;
+                for (const doc of studentsForAttendance.docs) {
+                    const student = doc.data();
+                    // Make 70% of students present
+                    const isPresent = count % 10 < 7;
+                    await addDoc(collection(window.db, 'attendance'), {
+                        studentId: doc.id,
+                        date: today,
+                        present: isPresent,
+                        class: student.class
+                    });
+                    count++;
+                }
+
+                // Add some demo test results
+                const testDates = [
+                    new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                    new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                    new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+                ];
+
+                const subjects = ['বাংলা', 'ইংরেজি', 'গণিত'];
+                const studentsForTests = await getDocs(collection(window.db, 'students'));
+                
+                let testCount = 0;
+                for (const doc of studentsForTests.docs) {
+                    const student = { id: doc.id, ...doc.data() };
+                    const subject = subjects[testCount % subjects.length];
+                    const testDate = testDates[testCount % testDates.length];
+                    const marks = Math.floor(Math.random() * 30) + 70; // Random marks between 70-100
+
+                    await addDoc(collection(window.db, 'tests'), {
+                        studentId: student.id,
+                        studentName: student.name,
+                        class: student.class,
+                        subject: subject,
+                        marks: marks.toString(),
+                        totalMarks: '100',
+                        date: testDate,
+                        createdAt: new Date().toISOString()
+                    });
+                    testCount++;
+                    if (testCount >= 15) break; // Add only 15 test results
+                }
+
+                console.log('Demo data initialized successfully');
+            } catch (error) {
+                console.error('Error initializing demo data:', error);
+            }
+        }
     </script>
 
     <script>
+        // Public view functions
+        function showAdminLogin() {
+            document.getElementById('publicView').style.display = 'none';
+            document.getElementById('loginPage').style.display = 'flex';
+        }
+
+        function backToPublicView() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('publicView').style.display = 'block';
+        }
+
+        async function loadPublicData() {
+            try {
+                const { collection, getDocs } = window.firestoreFunctions;
+                
+                // Load students count
+                const studentsSnapshot = await getDocs(collection(window.db, 'students'));
+                document.getElementById('publicTotalStudents').textContent = studentsSnapshot.size;
+                
+                // Load teachers count
+                const teachersSnapshot = await getDocs(collection(window.db, 'teachers'));
+                document.getElementById('publicTotalTeachers').textContent = teachersSnapshot.size;
+                
+                // Calculate today's attendance
+                const today = new Date().toISOString().split('T')[0];
+                const attendanceSnapshot = await getDocs(collection(window.db, 'attendance'));
+                let todayPresent = 0;
+                attendanceSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.date === today && data.present) {
+                        todayPresent++;
+                    }
+                });
+                document.getElementById('publicTodayPresent').textContent = todayPresent;
+
+                // Display all students for public
+                const students = [];
+                studentsSnapshot.forEach(doc => {
+                    students.push({ id: doc.id, ...doc.data() });
+                });
+                displayPublicStudents(students, today, attendanceSnapshot);
+
+                // Display recent test results
+                const testsSnapshot = await getDocs(collection(window.db, 'tests'));
+                const tests = [];
+                testsSnapshot.forEach(doc => {
+                    tests.push({ id: doc.id, ...doc.data() });
+                });
+                tests.sort((a, b) => new Date(b.date) - new Date(a.date));
+                displayPublicTests(tests.slice(0, 10));
+
+            } catch (error) {
+                console.error('Error loading public data:', error);
+            }
+        }
+
+        function displayPublicStudents(students, today, attendanceSnapshot) {
+            const tbody = document.getElementById('publicStudentsTableBody');
+            tbody.innerHTML = '';
+
+            students.forEach(student => {
+                // Check attendance for today
+                let isPresent = false;
+                attendanceSnapshot.forEach(doc => {
+                    const attendance = doc.data();
+                    if (attendance.studentId === student.id && attendance.date === today) {
+                        isPresent = attendance.present;
+                    }
+                });
+
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${student.roll}</td>
+                    <td>${student.name}</td>
+                    <td>ক্লাস ${student.class}</td>
+                    <td>
+                        <span class="badge ${isPresent ? 'present' : 'absent'}">
+                            ${isPresent ? '✓ উপস্থিত' : '✗ অনুপস্থিত'}
+                        </span>
+                    </td>
+                `;
+            });
+        }
+
+        function displayPublicTests(tests) {
+            const tbody = document.getElementById('publicTestsTableBody');
+            tbody.innerHTML = '';
+
+            tests.forEach(test => {
+                const row = tbody.insertRow();
+                const percentage = ((parseInt(test.marks) / parseInt(test.totalMarks)) * 100).toFixed(1);
+                row.innerHTML = `
+                    <td>${new Date(test.date).toLocaleDateString('bn-BD')}</td>
+                    <td>ক্লাস ${test.class}</td>
+                    <td>${test.subject}</td>
+                    <td>${test.studentName}</td>
+                    <td>${test.marks}/${test.totalMarks} (${percentage}%)</td>
+                `;
+            });
+        }
+
+        async function publicSearchStudents() {
+            const searchTerm = document.getElementById('publicSearchStudent').value.toLowerCase();
+            const filterClass = document.getElementById('publicFilterClass').value;
+
+            try {
+                const { collection, getDocs } = window.firestoreFunctions;
+                const studentsSnapshot = await getDocs(collection(window.db, 'students'));
+                const today = new Date().toISOString().split('T')[0];
+                const attendanceSnapshot = await getDocs(collection(window.db, 'attendance'));
+                
+                let students = [];
+                studentsSnapshot.forEach(doc => {
+                    students.push({ id: doc.id, ...doc.data() });
+                });
+
+                students = students.filter(student => {
+                    const matchesSearch = !searchTerm || 
+                        student.name.toLowerCase().includes(searchTerm) ||
+                        student.roll.toLowerCase().includes(searchTerm);
+                    
+                    const matchesClass = !filterClass || student.class === filterClass;
+                    
+                    return matchesSearch && matchesClass;
+                });
+
+                displayPublicStudents(students, today, attendanceSnapshot);
+            } catch (error) {
+                console.error('Error searching students:', error);
+            }
+        }
         // Login functionality
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -922,6 +1274,7 @@
             const password = document.getElementById('password').value;
 
             if (username === 'demo' && password === 'demo') {
+                document.getElementById('publicView').style.display = 'none';
                 document.getElementById('loginPage').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
                 loadDashboardData();
@@ -967,9 +1320,11 @@
 
         function logout() {
             document.getElementById('dashboard').style.display = 'none';
-            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('publicView').style.display = 'block';
             document.getElementById('username').value = '';
             document.getElementById('password').value = '';
+            loadPublicData();
         }
 
         // Tab navigation
