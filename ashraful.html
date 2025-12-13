@@ -577,6 +577,19 @@
     </style>
 </head>
 <body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; display: flex; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 40px; border-radius: 20px; text-align: center; max-width: 500px;">
+            <div style="font-size: 3em; margin-bottom: 20px;">⏳</div>
+            <h2 style="color: var(--primary); margin-bottom: 15px;">ডেমো ডেটা লোড হচ্ছে...</h2>
+            <p style="color: var(--text-light); margin-bottom: 10px;" id="loadingMessage">Firebase-এ ডেটা যোগ করা হচ্ছে</p>
+            <div style="background: var(--bg-light); height: 8px; border-radius: 4px; overflow: hidden; margin-top: 20px;">
+                <div id="loadingProgress" style="background: var(--primary); height: 100%; width: 0%; transition: width 0.3s;"></div>
+            </div>
+            <p style="margin-top: 10px; color: var(--text-light); font-size: 0.9em;" id="loadingStats"></p>
+        </div>
+    </div>
+
     <!-- Public View -->
     <div id="publicView">
         <div class="public-header">
@@ -1016,13 +1029,26 @@
         window.authFunctions = { sendPasswordResetEmail };
 
         // Initialize the app
-        window.addEventListener('load', () => {
-            initializeDemoData();
-            loadPublicData();
-            document.getElementById('attendanceDate').valueAsDate = new Date();
+        window.addEventListener('load', async () => {
+            try {
+                // Show loading screen
+                document.getElementById('loadingScreen').style.display = 'flex';
+                
+                await initializeDemoData();
+                await loadPublicData();
+                
+                document.getElementById('attendanceDate').valueAsDate = new Date();
+                
+                // Hide loading screen
+                document.getElementById('loadingScreen').style.display = 'none';
+            } catch (error) {
+                console.error('Initialization error:', error);
+                document.getElementById('loadingScreen').style.display = 'none';
+                alert('ডেটা লোড করতে সমস্যা হয়েছে। Firebase Rules চেক করুন এবং পেজ রিফ্রেশ করুন।');
+            }
         });
 
-        // Initialize comprehensive demo data
+        // Initialize comprehensive demo data with progress tracking
         async function initializeDemoData() {
             try {
                 const { collection, getDocs, addDoc } = window.firestoreFunctions;
@@ -1030,11 +1056,13 @@
                 // Check if data already exists
                 const studentsSnapshot = await getDocs(collection(window.db, 'students'));
                 if (studentsSnapshot.size > 0) {
-                    console.log('Demo data already exists');
+                    console.log('✅ Demo data already exists');
+                    updateLoadingMessage('ডেটা ইতিমধ্যে লোড করা আছে', 100);
                     return;
                 }
 
-                console.log('Initializing comprehensive demo data...');
+                console.log('🔄 Initializing comprehensive demo data...');
+                updateLoadingMessage('ডেমো ডেটা তৈরি করা হচ্ছে...', 5);
 
                 // Add demo students - 3-4 per class
                 const demoStudents = [
@@ -1075,17 +1103,27 @@
                     { roll: '1104', name: 'রুকাইয়া সুলতানা', class: '11', phone: '01712345624', monthlyFee: '3500', paymentDate: '8', previousResult: 'GPA 5.0' }
                 ];
 
+                updateLoadingMessage('শিক্ষার্থী যোগ করা হচ্ছে...', 10);
+
                 // Add students and store their IDs
                 const studentIds = {};
-                for (const student of demoStudents) {
-                    const docRef = await addDoc(collection(window.db, 'students'), {
-                        ...student,
-                        createdAt: new Date().toISOString()
-                    });
-                    studentIds[student.roll] = { id: docRef.id, ...student };
+                for (let i = 0; i < demoStudents.length; i++) {
+                    const student = demoStudents[i];
+                    try {
+                        const docRef = await addDoc(collection(window.db, 'students'), {
+                            ...student,
+                            createdAt: new Date().toISOString()
+                        });
+                        studentIds[student.roll] = { id: docRef.id, ...student };
+                        updateLoadingProgress(10 + (i / demoStudents.length) * 10);
+                    } catch (error) {
+                        console.error('Error adding student:', student.name, error);
+                        throw new Error('Firebase এ লিখতে সমস্যা হচ্ছে। Rules চেক করুন!');
+                    }
                 }
 
-                console.log('Students added:', Object.keys(studentIds).length);
+                console.log('✅ Students added:', Object.keys(studentIds).length);
+                updateLoadingMessage('শিক্ষক যোগ করা হচ্ছে...', 20);
 
                 // Add demo teachers
                 const demoTeachers = [
@@ -1104,7 +1142,8 @@
                     });
                 }
 
-                console.log('Teachers added:', demoTeachers.length);
+                console.log('✅ Teachers added:', demoTeachers.length);
+                updateLoadingMessage('উপস্থিতি রেকর্ড যোগ করা হচ্ছে...', 30);
 
                 // Add comprehensive attendance data for last 30 days
                 const attendanceData = [];
@@ -1112,9 +1151,8 @@
                     const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
                     
                     for (const [roll, student] of Object.entries(studentIds)) {
-                        // 75-85% attendance rate
                         const random = Math.random();
-                        const isPresent = random > 0.20; // 80% attendance
+                        const isPresent = random > 0.20;
                         
                         attendanceData.push({
                             studentId: student.id,
@@ -1128,26 +1166,29 @@
                 }
 
                 // Add attendance in batches
-                for (const attendance of attendanceData) {
-                    await addDoc(collection(window.db, 'attendance'), attendance);
+                for (let i = 0; i < attendanceData.length; i++) {
+                    await addDoc(collection(window.db, 'attendance'), attendanceData[i]);
+                    if (i % 50 === 0) {
+                        updateLoadingProgress(30 + (i / attendanceData.length) * 30);
+                        updateLoadingStats(`উপস্থিতি: ${i}/${attendanceData.length}`);
+                    }
                 }
 
-                console.log('Attendance records added:', attendanceData.length);
+                console.log('✅ Attendance records added:', attendanceData.length);
+                updateLoadingMessage('পরীক্ষার ফলাফল যোগ করা হচ্ছে...', 60);
 
-                // Add comprehensive test results for all subjects
+                // Add comprehensive test results
                 const subjects = ['বাংলা', 'ইংরেজি', 'গণিত', 'বিজ্ঞান', 'সামাজিক বিজ্ঞান'];
                 const testData = [];
 
-                // Generate 5 tests per subject per class (last 60 days)
                 for (let testNum = 0; testNum < 5; testNum++) {
-                    const daysAgo = testNum * 12 + Math.floor(Math.random() * 5); // Spread tests over 60 days
+                    const daysAgo = testNum * 12 + Math.floor(Math.random() * 5);
                     const testDate = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
                     
                     for (const subject of subjects) {
                         for (const [roll, student] of Object.entries(studentIds)) {
-                            // Generate realistic marks (60-100)
-                            const baseScore = 60 + Math.floor(Math.random() * 25); // 60-85
-                            const bonus = Math.random() > 0.3 ? Math.floor(Math.random() * 15) : 0; // Sometimes add 0-15
+                            const baseScore = 60 + Math.floor(Math.random() * 25);
+                            const bonus = Math.random() > 0.3 ? Math.floor(Math.random() * 15) : 0;
                             const marks = Math.min(100, baseScore + bonus);
                             
                             testData.push({
@@ -1165,14 +1206,18 @@
                     }
                 }
 
-                // Add test results
-                for (const test of testData) {
-                    await addDoc(collection(window.db, 'tests'), test);
+                for (let i = 0; i < testData.length; i++) {
+                    await addDoc(collection(window.db, 'tests'), testData[i]);
+                    if (i % 50 === 0) {
+                        updateLoadingProgress(60 + (i / testData.length) * 20);
+                        updateLoadingStats(`পরীক্ষা: ${i}/${testData.length}`);
+                    }
                 }
 
-                console.log('Test results added:', testData.length);
+                console.log('✅ Test results added:', testData.length);
+                updateLoadingMessage('পেমেন্ট রেকর্ড যোগ করা হচ্ছে...', 80);
 
-                // Add payment history for last 6 months
+                // Add payment history
                 const paymentData = [];
                 const months = ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'];
                 const currentMonth = new Date().getMonth();
@@ -1183,7 +1228,6 @@
                     const year = new Date().getFullYear() - (currentMonth - i < 0 ? 1 : 0);
                     
                     for (const [roll, student] of Object.entries(studentIds)) {
-                        // 90% payment rate
                         const isPaid = Math.random() > 0.10;
                         const paymentDateInMonth = parseInt(student.paymentDate);
                         const paidDate = isPaid ? 
@@ -1206,14 +1250,18 @@
                     }
                 }
 
-                // Add payment records
-                for (const payment of paymentData) {
-                    await addDoc(collection(window.db, 'payments'), payment);
+                for (let i = 0; i < paymentData.length; i++) {
+                    await addDoc(collection(window.db, 'payments'), paymentData[i]);
+                    if (i % 20 === 0) {
+                        updateLoadingProgress(80 + (i / paymentData.length) * 20);
+                        updateLoadingStats(`পেমেন্ট: ${i}/${paymentData.length}`);
+                    }
                 }
 
-                console.log('Payment records added:', paymentData.length);
+                console.log('✅ Payment records added:', paymentData.length);
+                updateLoadingMessage('সম্পন্ন হয়েছে! ✅', 100);
 
-                console.log('✅ All demo data initialized successfully!');
+                console.log('🎉 All demo data initialized successfully!');
                 console.log('Total records:', {
                     students: Object.keys(studentIds).length,
                     teachers: demoTeachers.length,
@@ -1223,9 +1271,31 @@
                 });
 
             } catch (error) {
-                console.error('Error initializing demo data:', error);
-                alert('ডেমো ডেটা লোড করতে সমস্যা হয়েছে। পেজ রিফ্রেশ করুন।');
+                console.error('❌ Error initializing demo data:', error);
+                updateLoadingMessage('❌ ত্রুটি: ' + error.message, 0);
+                throw error;
             }
+        }
+
+        function updateLoadingMessage(message, percent) {
+            const msgEl = document.getElementById('loadingMessage');
+            const progressEl = document.getElementById('loadingProgress');
+            if (msgEl) msgEl.textContent = message;
+            if (progressEl && percent !== undefined) {
+                progressEl.style.width = percent + '%';
+            }
+        }
+
+        function updateLoadingProgress(percent) {
+            const progressEl = document.getElementById('loadingProgress');
+            if (progressEl) {
+                progressEl.style.width = percent + '%';
+            }
+        }
+
+        function updateLoadingStats(stats) {
+            const statsEl = document.getElementById('loadingStats');
+            if (statsEl) statsEl.textContent = stats;
         }
     </script>
 
